@@ -1,11 +1,13 @@
 "use client"
-import { Box, Button, IconButton, TextField, Typography, InputAdornment } from "@mui/material"
+import { Box, Button, IconButton, TextField, Typography, InputAdornment, Drawer, List, ListItem, ListItemText, Divider } from "@mui/material"
 import SendIcon from "@mui/icons-material/Send"
 import VolumeUpIcon from "@mui/icons-material/VolumeUp"
+import MenuIcon from "@mui/icons-material/Menu"
 import { useState } from "react"
 
 export default function Home() {
   const [isHomePage, setIsHomePage] = useState(true) // State to toggle between home page and main page
+  const [drawerOpen, setDrawerOpen] = useState(false) // State to manage Drawer open/close
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([{
     role: "assistant",
@@ -77,6 +79,22 @@ export default function Home() {
     speechSynthesis.speak(speech);
   }
 
+  /* FUNCTION TO START A NEW CHAT */
+  const startNewChat = () => {
+    // Cancel any ongoing speech when starting a new chat
+    if (currentSpeech) {
+      speechSynthesis.cancel();
+      setCurrentSpeech(null);
+    }
+
+    // Reset the message and messages states
+    setMessage("");
+    setMessages([{
+      role: "assistant",
+      content: `Hi, I am your Support Agent. How can I help you today?`
+    }]);
+  }
+
   /* HANDLE ENTER KEY */
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -124,6 +142,59 @@ export default function Home() {
         </Box>
       ) : (
         <>
+          <Button
+            sx={{ 
+              position: "absolute", 
+              left: 0, 
+              top: 0, 
+              margin: 1,
+              color: "#10a37f", // Text color
+              "&:hover": {
+                color: "#0e8a6d" // Darker shade on hover
+              }
+            }} 
+            onClick={() => setDrawerOpen(true)}
+            >
+            <MenuIcon />
+          </Button>
+          <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+            <Box
+              sx={{
+                width: "250px",
+                background: "#333", // Dark background color for the Drawer
+                color: "#fff", // White text color for contrast
+                height: "100%",
+              }}
+              role="presentation"
+              onClick={() => setDrawerOpen(false)}
+              onKeyDown={() => setDrawerOpen(false)}
+            >
+              <List>
+                <ListItem
+                  sx={{
+                    "&:hover": {
+                      background: "#444", // Slightly lighter on hover
+                      cursor: "pointer", // Pointer cursor on hover
+                    },
+                  }}
+                >
+                  <ListItemText primary="Home" onClick={() => setIsHomePage(true)} />
+                </ListItem>
+                <Divider sx={{ borderColor: "#555" }} /> {/* Custom color for the Divider */}
+                <ListItem
+                  sx={{
+                    "&:hover": {
+                      background: "#444", // Slightly lighter on hover
+                      cursor: "pointer", // Pointer cursor on hover
+                    },
+                  }}
+                >
+                  <ListItemText primary="New Chat" onClick={startNewChat} />
+                </ListItem>
+              </List>
+            </Box>
+          </Drawer>
+
           {/* MAIN CHAT AREA */}
           <Box
             flexGrow={1}
@@ -163,6 +234,7 @@ export default function Home() {
                       wordWrap: "break-word",
                       display: "flex",
                       alignItems: "center",
+                      marginTop: 5
                     }}
                   >
                     <Typography variant="body1" sx={{ flexGrow: 1 }}>
@@ -187,48 +259,43 @@ export default function Home() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown} // Listen for Enter key
+                fullWidth
                 sx={{
                   borderRadius: 10,
                   background: "rgba(52, 53, 65, 0.7)", // Semi-transparent background
                   border: "none", // No border
-                  color: "#d1d5db", // Text color
-                  width: "100%", // Take up full width
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      border: "none", // Remove the border
+                      border: "none" // No border
+                    },
+                    "&:hover fieldset": {
+                      border: "none" // No border on hover
                     },
                     "&.Mui-focused fieldset": {
-                      border: "none", // No border on focus
+                      border: "none" // No border on focus
                     },
+                    "& input": {
+                      color: "#d1d5db" // Text color for the input text
+                    }
                   },
-                  '& input': {
-                    paddingLeft: "20px", // Padding inside the input field
-                    color: "#d1d5db", // Input text color
-                  }
-                }}
-                InputLabelProps={{
-                  style: { color: "#d1d5db" }, // Placeholder color
                 }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        color="primary"
+                        edge="end"
                         onClick={sendMessage}
                         sx={{
-                          borderRadius: 5,
-                          background: "#10a37f", // Set a custom background color
-                          color: "#fff", // Icon color
+                          color: "#10a37f", // Set a custom color for the icon
                           "&:hover": {
-                            background: "#0e8a6d", // Darker shade on hover
+                            color: "#0e8a6d" // Darker shade on hover
                           }
                         }}
                       >
-                        <SendIcon /> {/* The send Icon */}
+                        <SendIcon />
                       </IconButton>
                     </InputAdornment>
-                  ),
-                  
+                  )
                 }}
               />
             </Box>
