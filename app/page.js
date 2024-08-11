@@ -6,25 +6,31 @@ import MenuIcon from "@mui/icons-material/Menu"
 import { useState } from "react"
 
 export default function Home() {
-  const [isHomePage, setIsHomePage] = useState(true) // State to toggle between home page and main page
-  const [drawerOpen, setDrawerOpen] = useState(false) // State to manage Drawer open/close
-  const [message, setMessage] = useState("")
+  // STATE TO TOGGLE BETWEEN HOME PAGE AND MAIN PAGE
+  const [isHomePage, setIsHomePage] = useState(true) 
+  // STATE TO MANAGE DRAWER OPEN/CLOSE
+  const [drawerOpen, setDrawerOpen] = useState(false) 
+  // STATE TO HANDLE CURRENT USER INPUT MESSAGE
+  const [message, setMessage] = useState("") 
+  // STATE TO STORE MESSAGES FOR THE CHAT INTERFACE
   const [messages, setMessages] = useState([{
     role: "assistant",
     content: `Hi, I am your Support Agent. How can I help you today?`
   }])
-  const [currentSpeech, setCurrentSpeech] = useState(null) // State to keep track of current speech
+  // STATE TO TRACK CURRENT SPEECH FOR VOICE OUTPUT
+  const [currentSpeech, setCurrentSpeech] = useState(null)
 
   /* FUNCTION TO SEND MESSAGE */
   const sendMessage = async () => {
-    if (!message.trim()) return; // Prevent sending empty messages
+    if (!message.trim()) return; // PREVENT SENDING EMPTY MESSAGES
     
-    // Cancel the current speech before sending a new message
+    // CANCEL THE CURRENT SPEECH BEFORE SENDING A NEW MESSAGE
     if (currentSpeech) {
       speechSynthesis.cancel();
       setCurrentSpeech(null);
     }
 
+    // CLEAR THE INPUT FIELD AND ADD USER AND ASSISTANT MESSAGES TO THE STATE
     setMessage("")
     setMessages((messages) => [
       ...messages,
@@ -69,25 +75,26 @@ export default function Home() {
 
   /* FUNCTION TO SPEAK A MESSAGE */
   const speakMessage = (text) => {
-    // Cancel any ongoing speech before starting new speech
+    // CANCEL ANY ONGOING SPEECH BEFORE STARTING NEW SPEECH
     if (currentSpeech) {
       speechSynthesis.cancel();
     }
     
+    // INITIALIZE AND START SPEAKING THE MESSAGE
     const speech = new SpeechSynthesisUtterance(text);
-    setCurrentSpeech(speech); // Set the current speech
+    setCurrentSpeech(speech); // SET THE CURRENT SPEECH
     speechSynthesis.speak(speech);
   }
 
   /* FUNCTION TO START A NEW CHAT */
   const startNewChat = () => {
-    // Cancel any ongoing speech when starting a new chat
+    // CANCEL ANY ONGOING SPEECH WHEN STARTING A NEW CHAT
     if (currentSpeech) {
       speechSynthesis.cancel();
       setCurrentSpeech(null);
     }
 
-    // Reset the message and messages states
+    // RESET THE MESSAGE AND MESSAGES STATES
     setMessage("");
     setMessages([{
       role: "assistant",
@@ -97,6 +104,7 @@ export default function Home() {
 
   /* HANDLE ENTER KEY */
   const handleKeyDown = (e) => {
+    // IF "ENTER" KEY IS PRESSED, SEND THE MESSAGE
     if (e.key === "Enter") {
       sendMessage();
     }
@@ -114,13 +122,13 @@ export default function Home() {
       }}
     >
       {isHomePage ? (
-        /* HOME PAGE */
+        /* HOME PAGE DISPLAY */
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
           <Typography 
             variant="h2" 
             mb={4}
             sx={{
-              color: "#d1d5db", // Light gray color
+              color: "#d1d5db", // LIGHT GRAY COLOR
             }}
           >
             Welcome to AI Customer Support
@@ -130,10 +138,10 @@ export default function Home() {
             size="large" 
             onClick={() => setIsHomePage(false)}
             sx={{
-              background: "#10a37f", // Set a custom background color
-              color: "#fff", // Text color
+              background: "#10a37f", // CUSTOM BACKGROUND COLOR
+              color: "#fff", // TEXT COLOR
               "&:hover": {
-                background: "#0e8a6d", // Darker shade on hover
+                background: "#0e8a6d", // DARKER SHADE ON HOVER
               },
             }}
           >
@@ -142,27 +150,30 @@ export default function Home() {
         </Box>
       ) : (
         <>
+          {/* MENU BUTTON TO OPEN DRAWER */}
           <Button
             sx={{ 
               position: "absolute", 
               left: 0, 
               top: 0, 
               margin: 1,
-              color: "#10a37f", // Text color
+              color: "#10a37f", // TEXT COLOR
               "&:hover": {
-                color: "#0e8a6d" // Darker shade on hover
+                color: "#0e8a6d" // DARKER SHADE ON HOVER
               }
             }} 
             onClick={() => setDrawerOpen(true)}
             >
             <MenuIcon />
           </Button>
+          
+          {/* DRAWER COMPONENT FOR NAVIGATION */}
           <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
             <Box
               sx={{
                 width: "250px",
-                background: "#333", // Dark background color for the Drawer
-                color: "#fff", // White text color for contrast
+                background: "#333", // DARK BACKGROUND COLOR FOR THE DRAWER
+                color: "#fff", // WHITE TEXT COLOR FOR CONTRAST
                 height: "100%",
               }}
               role="presentation"
@@ -173,19 +184,19 @@ export default function Home() {
                 <ListItem
                   sx={{
                     "&:hover": {
-                      background: "#444", // Slightly lighter on hover
-                      cursor: "pointer", // Pointer cursor on hover
+                      background: "#444", // SLIGHTLY LIGHTER ON HOVER
+                      cursor: "pointer", // POINTER CURSOR ON HOVER
                     },
                   }}
                 >
                   <ListItemText primary="Home" onClick={() => setIsHomePage(true)} />
                 </ListItem>
-                <Divider sx={{ borderColor: "#555" }} /> {/* Custom color for the Divider */}
+                <Divider sx={{ borderColor: "#555" }} /> {/* CUSTOM COLOR FOR THE DIVIDER */}
                 <ListItem
                   sx={{
                     "&:hover": {
-                      background: "#444", // Slightly lighter on hover
-                      cursor: "pointer", // Pointer cursor on hover
+                      background: "#444", // SLIGHTLY LIGHTER ON HOVER
+                      cursor: "pointer", // POINTER CURSOR ON HOVER
                     },
                   }}
                 >
@@ -204,14 +215,14 @@ export default function Home() {
             sx={{
               padding: "20px",
               overflowY: "auto",
-              background: "#444654", // Darker gray background for a clean look
+              background: "#444654", // DARKER GRAY BACKGROUND FOR A CLEAN LOOK
             }}
           >
             <Box
               sx={{
                 flexGrow: 1,
                 overflowY: "auto",
-                paddingRight: "8px", // Add some padding for smooth scrolling
+                paddingRight: "8px", // ADD SOME PADDING FOR SMOOTH SCROLLING
               }}
             >
               {messages.map((msg, index) => (
@@ -225,7 +236,7 @@ export default function Home() {
                 >
                   <Box
                     sx={{
-                      background: msg.role === "assistant" ? "#343541" : "#10a37f", // Assistant and User Messages
+                      background: msg.role === "assistant" ? "#343541" : "#10a37f", // ASSISTANT AND USER MESSAGES COLORS
                       color: msg.role === "assistant" ? "#d1d5db" : "#fff",
                       borderRadius: 2,
                       p: 2,
@@ -258,44 +269,37 @@ export default function Home() {
                 variant="outlined"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown} // Listen for Enter key
+                onKeyDown={handleKeyDown} // LISTEN FOR ENTER KEY
                 fullWidth
                 sx={{
                   borderRadius: 10,
-                  background: "rgba(52, 53, 65, 0.7)", // Semi-transparent background
-                  border: "none", // No border
+                  background: "rgba(52, 53, 65, 0.7)", // SEMI-TRANSPARENT BACKGROUND
+                  border: "none", // NO BORDER
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      border: "none" // No border
+                      border: "none", // REMOVE BORDER FROM THE FIELDSET
                     },
-                    "&:hover fieldset": {
-                      border: "none" // No border on hover
-                    },
-                    "&.Mui-focused fieldset": {
-                      border: "none" // No border on focus
-                    },
-                    "& input": {
-                      color: "#d1d5db" // Text color for the input text
-                    }
+                  },
+                  "& input": {
+                    color: "#fff", // WHITE TEXT COLOR
                   },
                 }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        edge="end"
-                        onClick={sendMessage}
+                        onClick={sendMessage} // SEND MESSAGE WHEN ICON IS CLICKED
                         sx={{
-                          color: "#10a37f", // Set a custom color for the icon
+                          color: "#10a37f", // ICON COLOR
                           "&:hover": {
-                            color: "#0e8a6d" // Darker shade on hover
-                          }
+                            color: "#0e8a6d", // DARKER ICON COLOR ON HOVER
+                          },
                         }}
                       >
                         <SendIcon />
                       </IconButton>
                     </InputAdornment>
-                  )
+                  ),
                 }}
               />
             </Box>
