@@ -51,12 +51,12 @@ export default function Home() {
       const decoder=new TextDecoder()
 
       let result=''
-      return (
-        reader.read().then(function processText({ done, value }) {
+      return(
+        reader.read().then(function processText({done,value}) {
           if(done){
-            return (result)
+            return(result)
           }
-          const text=decoder.decode(value || new Int8Array(), { stream:true })
+          const text=decoder.decode(value || new Int8Array(),{stream:true})
           setMessages((messages) => {
             let lastMessage=messages[messages.length - 1]
             let otherMessages=messages.slice(0, messages.length - 1)
@@ -111,7 +111,7 @@ export default function Home() {
     }
   }
 
-  return (
+  return(
     <Box
       width='100vw'
       height='100vh'
