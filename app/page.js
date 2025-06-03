@@ -1,69 +1,70 @@
-"use client"
-import { Box, Button, IconButton, TextField, Typography, InputAdornment, Drawer, List, ListItem, ListItemText, Divider } from "@mui/material"
-import SendIcon from "@mui/icons-material/Send"
-import VolumeUpIcon from "@mui/icons-material/VolumeUp"
-import MenuIcon from "@mui/icons-material/Menu"
-import { useState } from "react"
+'use client'
+import {Box,Button,IconButton,TextField,Typography,InputAdornment,Drawer,List,ListItem,ListItemText,Divider} from '@mui/material'
+import SendIcon from '@mui/icons-material/Send'
+import VolumeUpIcon from '@mui/icons-material/VolumeUp'
+import MenuIcon from '@mui/icons-material/Menu'
+import {useState} from 'react'
 
 export default function Home() {
-  // STATE TO TOGGLE BETWEEN HOME PAGE AND MAIN PAGE
-  const [isHomePage, setIsHomePage] = useState(true) 
-  // STATE TO MANAGE DRAWER OPEN/CLOSE
-  const [drawerOpen, setDrawerOpen] = useState(false) 
-  // STATE TO HANDLE CURRENT USER INPUT MESSAGE
-  const [message, setMessage] = useState("") 
-  // STATE TO STORE MESSAGES FOR THE CHAT INTERFACE
-  const [messages, setMessages] = useState([{
-    role: "assistant",
-    content: `Hi, I am your Support Agent. How can I help you today?`
+  // state to toggle between home page and main page
+  const[isHomePage, setIsHomePage]=useState(true) 
+  // state to manage drawer open/close
+  const[drawerOpen, setDrawerOpen]=useState(false) 
+  // state to handle current user input message
+  const[message, setMessage]=useState('') 
+  // state to store messages for the chat interface
+  const[messages, setMessages]=useState([{
+    role:'assistant',
+    content:`Hi, I am your Support Agent. How can I help you today?`
   }])
-  // STATE TO TRACK CURRENT SPEECH FOR VOICE OUTPUT
-  const [currentSpeech, setCurrentSpeech] = useState(null)
+  // state to track current speech for voice output
+  const [currentSpeech, setCurrentSpeech]=useState(null)
 
-  /* FUNCTION TO SEND MESSAGE */
-  const sendMessage = async () => {
-    if (!message.trim()) return; // PREVENT SENDING EMPTY MESSAGES
-    
-    // CANCEL THE CURRENT SPEECH BEFORE SENDING A NEW MESSAGE
-    if (currentSpeech) {
-      speechSynthesis.cancel();
-      setCurrentSpeech(null);
+  /* function to send message */
+  const sendMessage=async () => {
+    if(!message.trim()){
+      return // prevent sending empty messages
+    }
+    // cancel the current speech before sending a new message
+    if(currentSpeech){
+      speechSynthesis.cancel()
+      setCurrentSpeech(null)
     }
 
-    // CLEAR THE INPUT FIELD AND ADD USER AND ASSISTANT MESSAGES TO THE STATE
-    setMessage("")
+    // clear the input field and add user and assistant messages to the state
+    setMessage('')
     setMessages((messages) => [
       ...messages,
-      { role: "user", content: message },
-      { role: "assistant", content: "" }
+      { role:'user', content:message },
+      { role:'assistant', content:'' }
     ])
 
-    /* FETCH RESPONSE */
-    const response = fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    /* fetch response */
+    const response=fetch('/api/chat', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
       },
-      body: JSON.stringify([...messages, { role: "user", content: message }])
+      body:JSON.stringify([...messages, { role:'user', content:message }])
     }).then(async (res) => {
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
+      const reader=res.body.getReader()
+      const decoder=new TextDecoder()
 
-      let result = ""
+      let result=''
       return (
         reader.read().then(function processText({ done, value }) {
-          if (done) {
+          if(done){
             return (result)
           }
-          const text = decoder.decode(value || new Int8Array(), { stream: true })
+          const text=decoder.decode(value || new Int8Array(), { stream:true })
           setMessages((messages) => {
-            let lastMessage = messages[messages.length - 1]
-            let otherMessages = messages.slice(0, messages.length - 1)
+            let lastMessage=messages[messages.length - 1]
+            let otherMessages=messages.slice(0, messages.length - 1)
             return ([
               ...otherMessages,
               {
                 ...lastMessage,
-                content: lastMessage.content + text
+                content:lastMessage.content + text
               }
             ])
           })
@@ -73,226 +74,226 @@ export default function Home() {
     })
   }
 
-  /* FUNCTION TO SPEAK A MESSAGE */
-  const speakMessage = (text) => {
-    // CANCEL ANY ONGOING SPEECH BEFORE STARTING NEW SPEECH
-    if (currentSpeech) {
-      speechSynthesis.cancel();
+  /* function to speak a message */
+  const speakMessage=(text) => {
+    // cancel any ongoing speech before starting new speech
+    if(currentSpeech){
+      speechSynthesis.cancel()
     }
     
-    // INITIALIZE AND START SPEAKING THE MESSAGE
-    const speech = new SpeechSynthesisUtterance(text);
-    setCurrentSpeech(speech); // SET THE CURRENT SPEECH
-    speechSynthesis.speak(speech);
+    // initialize and start speaking the message
+    const speech=new SpeechSynthesisUtterance(text)
+    setCurrentSpeech(speech) // set the current speech
+    speechSynthesis.speak(speech)
   }
 
-  /* FUNCTION TO START A NEW CHAT */
-  const startNewChat = () => {
-    // CANCEL ANY ONGOING SPEECH WHEN STARTING A NEW CHAT
-    if (currentSpeech) {
-      speechSynthesis.cancel();
-      setCurrentSpeech(null);
+  /* function to start a new chat */
+  const startNewChat=() => {
+    // cancel any ongoing speech when starting a new chat
+    if(currentSpeech){
+      speechSynthesis.cancel()
+      setCurrentSpeech(null)
     }
 
-    // RESET THE MESSAGE AND MESSAGES STATES
-    setMessage("");
+    // reset the message and messages states
+    setMessage('')
     setMessages([{
-      role: "assistant",
-      content: `Hi, I am your Support Agent. How can I help you today?`
-    }]);
+      role:'assistant',
+      content:`Hi, I am your Support Agent. How can I help you today?`
+    }])
   }
 
-  /* HANDLE ENTER KEY */
-  const handleKeyDown = (e) => {
-    // IF "ENTER" KEY IS PRESSED, SEND THE MESSAGE
-    if (e.key === "Enter") {
-      sendMessage();
+  /* handle enter key */
+  const handleKeyDown=(e) => {
+    // if'enter' key is pressed, send the message
+    if(e.key === 'Enter'){
+      sendMessage()
     }
   }
 
   return (
     <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
+      width='100vw'
+      height='100vh'
+      display='flex'
+      flexDirection='column'
       sx={{
-        background: "linear-gradient(135deg, #343541, #202123)",
-        fontFamily: "Roboto, sans-serif",
+        background:'linear-gradient(135deg, #343541, #202123)',
+        fontFamily:'Roboto, sans-serif',
       }}
     >
       {isHomePage ? (
-        /* HOME PAGE DISPLAY */
-        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+        /* home page display */
+        <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center' height='100%'>
           <Typography 
-            variant="h2" 
+            variant='h2' 
             mb={4}
             sx={{
-              color: "#d1d5db", // LIGHT GRAY COLOR
+              color:'#d1d5db', // light gray color
             }}
           >
             Welcome to AI Customer Support
           </Typography>
           <Button 
-            variant="contained" 
-            size="large" 
+            variant='contained' 
+            size='large' 
             onClick={() => setIsHomePage(false)}
             sx={{
-              background: "#10a37f", // CUSTOM BACKGROUND COLOR
-              color: "#fff", // TEXT COLOR
-              "&:hover": {
-                background: "#0e8a6d", // DARKER SHADE ON HOVER
+              background:'#10a37f', // custom background color
+              color:'#fff', // text color
+              '&:hover':{
+                background:'#0e8a6d', // darker shade on hover
               },
             }}
           >
             Get Started
           </Button>
         </Box>
-      ) : (
+      ):(
         <>
-          {/* MENU BUTTON TO OPEN DRAWER */}
+          {/* menu button to open drawer */}
           <Button
             sx={{ 
-              position: "absolute", 
-              left: 0, 
-              top: 0, 
-              margin: 1,
-              color: "#10a37f", // TEXT COLOR
-              "&:hover": {
-                color: "#0e8a6d" // DARKER SHADE ON HOVER
+              position:'absolute', 
+              left:0, 
+              top:0, 
+              margin:1,
+              color:'#10a37f', // text color
+              '&:hover':{
+                color:'#0e8a6d' // darker shade on hover
               }
             }} 
             onClick={() => setDrawerOpen(true)}
-            >
+          >
             <MenuIcon />
           </Button>
           
-          {/* DRAWER COMPONENT FOR NAVIGATION */}
+          {/* drawer component for navigation */}
           <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
             <Box
               sx={{
-                width: "250px",
-                background: "#333", // DARK BACKGROUND COLOR FOR THE DRAWER
-                color: "#fff", // WHITE TEXT COLOR FOR CONTRAST
-                height: "100%",
+                width:'250px',
+                background:'#333', // dark background color for the drawer
+                color:'#fff', // white text color for contrast
+                height:'100%',
               }}
-              role="presentation"
+              role='presentation'
               onClick={() => setDrawerOpen(false)}
               onKeyDown={() => setDrawerOpen(false)}
             >
               <List>
                 <ListItem
                   sx={{
-                    "&:hover": {
-                      background: "#444", // SLIGHTLY LIGHTER ON HOVER
-                      cursor: "pointer", // POINTER CURSOR ON HOVER
+                    '&:hover':{
+                      background:'#444', // slightly lighter on hover
+                      cursor:'pointer', // pointer cursor on hover
                     },
                   }}
                 >
-                  <ListItemText primary="Home" onClick={() => setIsHomePage(true)} />
+                  <ListItemText primary='Home' onClick={() => setIsHomePage(true)} />
                 </ListItem>
-                <Divider sx={{ borderColor: "#555" }} /> {/* CUSTOM COLOR FOR THE DIVIDER */}
+                <Divider sx={{ borderColor:'#555' }} /> {/* custom color for the divider */}
                 <ListItem
                   sx={{
-                    "&:hover": {
-                      background: "#444", // SLIGHTLY LIGHTER ON HOVER
-                      cursor: "pointer", // POINTER CURSOR ON HOVER
+                    '&:hover':{
+                      background:'#444', // slightly lighter on hover
+                      cursor:'pointer', // pointer cursor on hover
                     },
                   }}
                 >
-                  <ListItemText primary="New Chat" onClick={startNewChat} />
+                  <ListItemText primary='New Chat' onClick={startNewChat} />
                 </ListItem>
               </List>
             </Box>
           </Drawer>
 
-          {/* MAIN CHAT AREA */}
+          {/* main chat area */}
           <Box
             flexGrow={1}
-            display="flex"
-            flexDirection="column"
-            justifyContent="space-between"
+            display='flex'
+            flexDirection='column'
+            justifyContent='space-between'
             sx={{
-              padding: "20px",
-              overflowY: "auto",
-              background: "#444654", // DARKER GRAY BACKGROUND FOR A CLEAN LOOK
+              padding:'20px',
+              overflowY:'auto',
+              background:'#444654', // darker gray background for a clean look
             }}
           >
             <Box
               sx={{
-                flexGrow: 1,
-                overflowY: "auto",
-                paddingRight: "8px", // ADD SOME PADDING FOR SMOOTH SCROLLING
+                flexGrow:1,
+                overflowY:'auto',
+                paddingRight:'8px', // add some padding for smooth scrolling
               }}
             >
               {messages.map((msg, index) => (
                 <Box
                   key={index}
-                  display="flex"
+                  display='flex'
                   justifyContent={
-                    msg.role === "assistant" ? "flex-start" : "flex-end"
+                    msg.role === 'assistant' ? 'flex-start' :'flex-end'
                   }
                   mb={2}
                 >
                   <Box
                     sx={{
-                      background: msg.role === "assistant" ? "#343541" : "#10a37f", // ASSISTANT AND USER MESSAGES COLORS
-                      color: msg.role === "assistant" ? "#d1d5db" : "#fff",
-                      borderRadius: 2,
-                      p: 2,
-                      boxShadow: 1,
-                      maxWidth: "75%",
-                      wordWrap: "break-word",
-                      display: "flex",
-                      alignItems: "center",
-                      marginTop: 5
+                      background:msg.role === 'assistant' ? '#343541' :'#10a37f', // assistant and user messages colors
+                      color:msg.role === 'assistant' ? '#d1d5db' :'#fff',
+                      borderRadius:2,
+                      p:2,
+                      boxShadow:1,
+                      maxWidth:'75%',
+                      wordWrap:'break-word',
+                      display:'flex',
+                      alignItems:'center',
+                      marginTop:5
                     }}
                   >
-                    <Typography variant="body1" sx={{ flexGrow: 1 }}>
+                    <Typography variant='body1' sx={{ flexGrow:1 }}>
                       {msg.content}
                     </Typography>
-                    {msg.role === "assistant" && (
+                    {msg.role === 'assistant' && (
                       <IconButton
                         onClick={() => speakMessage(msg.content)}
-                        sx={{ ml: 2 }}
+                        sx={{ ml:2 }}
                       >
-                        <VolumeUpIcon sx={{ color: "#d1d5db" }} />
+                        <VolumeUpIcon sx={{ color:'#d1d5db' }} />
                       </IconButton>
                     )}
                   </Box>
                 </Box>
               ))}
             </Box>
-            <Box display="flex" mt={2}>
+            <Box display='flex' mt={2}>
               <TextField
-                placeholder="Send a message..."
-                variant="outlined"
+                placeholder='Send a message...'
+                variant='outlined'
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown} // LISTEN FOR ENTER KEY
+                onKeyDown={handleKeyDown} // listen for enter key
                 fullWidth
                 sx={{
-                  borderRadius: 10,
-                  background: "rgba(52, 53, 65, 0.7)", // SEMI-TRANSPARENT BACKGROUND
-                  border: "none", // NO BORDER
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      border: "none", // REMOVE BORDER FROM THE FIELDSET
+                  borderRadius:10,
+                  background:'rgba(52, 53, 65, 0.7)', // semi-transparent background
+                  border:'none', // no border
+                  '& .MuiOutlinedInput-root':{
+                    '& fieldset':{
+                      border:'none', // remove border from the fieldset
                     },
                   },
-                  "& input": {
-                    color: "#fff", // WHITE TEXT COLOR
+                  '& input':{
+                    color:'#fff', // white text color
                   },
                 }}
                 InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
+                  endAdornment:(
+                    <InputAdornment position='end'>
                       <IconButton
-                        onClick={sendMessage} // SEND MESSAGE WHEN ICON IS CLICKED
+                        onClick={sendMessage} // send message when icon is clicked
                         sx={{
-                          color: "#10a37f", // ICON COLOR
-                          "&:hover": {
-                            color: "#0e8a6d", // DARKER ICON COLOR ON HOVER
+                          color:'#10a37f', // icon color
+                          '&:hover':{
+                            color:'#0e8a6d', // darker icon color on hover
                           },
                         }}
                       >

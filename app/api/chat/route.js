@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server"
+import {NextResponse} from "next/server"
 import OpenAI from "openai"
 
-const systemPrompt = `
+const systemPrompt=`
 You are an AI-powered customer support assistant for a revolutionary platform that empowers users to accomplish anything they desire. This platform offers a wide range of services and tools that cover every aspect of life, from productivity and entertainment to personal growth and well-being.
 
 Your role is to assist users with any questions or issues they might have, providing clear, concise, and helpful responses. You should always aim to enhance the user's experience on the platform, guiding them to the resources, features, or services that best meet their needs.
@@ -17,38 +17,38 @@ Key Guidelines:
 Remember, your goal is to make the user's experience as seamless and enjoyable as possible on this all-encompassing platform.
 `
 
-export async function POST(req) {
-    const openai = new OpenAI()
-    const data = await req.json()
+export async function POST(req){
+    const openai=new OpenAI()
+    const data=await req.json()
 
-    const completion = await openai.chat.completions.create({
-        messages: [
+    const completion=await openai.chat.completions.create({
+        messages:[
             {
-            role: "system",
-            content: systemPrompt
+            role:"system",
+            content:systemPrompt
             },
             ...data,
         ],
-        model: "gpt-4o-mini",
-        stream: true
+        model:"gpt-4o-mini",
+        stream:true
     })
 
-    const stream = new ReadableStream({
-        async start(controller) {
-            const encoder = new TextEncoder()
-            try {
-                for await (const chunk of completion) {
-                    const content = chunk.choices[0]?.delta?.content
-                    if(content) {
-                        const text = encoder.encode(content)
+    const stream=new ReadableStream({
+        async start(controller){
+            const encoder=new TextEncoder()
+            try{
+                for await (const chunk of completion){
+                    const content=chunk.choices[0]?.delta?.content
+                    if(content){
+                        const text=encoder.encode(content)
                         controller.enqueue(text)
                     }
                 }
             }
-            catch(errors) {
+            catch(errors){
                 controller.error(errors)
             }
-            finally {
+            finally{
                 controller.close()
             }
         }
