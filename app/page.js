@@ -40,7 +40,7 @@ export default function Home() {
     ])
 
     /* fetch response */
-    const response=fetch('/api/chat', {
+    const response=fetch('/api/chat',{
       method:'POST',
       headers:{
         'Content-Type':'application/json'
